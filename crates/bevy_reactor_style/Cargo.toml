@@ -1,0 +1,10 @@
+[package]
+name = "bevy_reactor_style"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { workspace=true }
+bevy_reactor_core = {path ="../bevy_reactor_core"}
+bevy_mod_picking = { workspace=true }
+impl-trait-for-tuples = "0.2.2"
