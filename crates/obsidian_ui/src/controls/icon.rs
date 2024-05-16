@@ -1,5 +1,5 @@
 use bevy::{asset::AssetPath, prelude::*};
-use bevy_reactor_core::{Cx,IntoSignal, Signal, RunContextWrite};
+use bevy_reactor_core::{Cx,IntoSignal, Signal};
 use bevy_reactor_style::{StyleBuilder, StyleBuilderBackground, StyleBuilderLayout, StyleHandle, StyleTuple, WithStyles};
 use bevy_reactor_view::{Element, IntoView, ViewTemplate};
 use bevy_reactor_core::EffectTarget;

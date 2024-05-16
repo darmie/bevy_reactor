@@ -14,8 +14,7 @@ use bevy::{
         ButtonInput, ButtonState,
     },
     log::*,
-    ui::Node,
-    window::ReceivedCharacter,
+    ui::Node
 };
 use bevy_mod_picking::prelude::{EntityEvent, EventListenerPlugin};
 
@@ -277,7 +276,7 @@ fn handle_tab(
 
 fn handle_text_input(
     mut key_events: EventReader<KeyboardInput>,
-    mut char_events: EventReader<ReceivedCharacter>,
+    mut char_events: EventReader<KeyboardInput>,
     key: Res<ButtonInput<KeyCode>>,
     focus: ResMut<Focus>,
     mut press_writer: EventWriter<KeyPressEvent>,

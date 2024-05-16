@@ -1,15 +1,12 @@
-use std::{any::Any, sync::{Arc, Mutex}};
+use std::sync::{Arc, Mutex};
 
 use bevy::{
-    core::Name,
+    prelude::*,
     ecs::{
-        component::Component,
         entity::Entity,
-        query::{Added, With},
         world::{Command, World},
     },
-    hierarchy::{BuildWorldChildren, Parent},
-    log::warn,
+    hierarchy::BuildWorldChildren,
 };
 
 use crate::{element::Element, text::{TextComputed, TextStatic}};

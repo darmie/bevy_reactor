@@ -12,7 +12,7 @@ mod builder_z_index;
 
 use std::sync::Arc;
 
-use bevy_reactor_core::{EffectTarget,  EntityEffect, TrackingScope};
+use bevy_reactor_core::{EntityEffect, TrackingScope};
 // pub use atlas_loader::TextureAtlasLoader;
 use bevy::{prelude::*, ui};
 pub use builder::StyleBuilder;

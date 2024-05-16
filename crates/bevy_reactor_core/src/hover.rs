@@ -1,5 +1,4 @@
-use bevy::{hierarchy::Parent, prelude::*};
-use bevy_mod_picking::{focus::HoverMap, pointer::PointerId};
+use bevy::prelude::*;
 
 use crate::{signal::Signal, Cx, RunContextRead, RunContextSetup};
 

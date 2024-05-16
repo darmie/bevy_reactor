@@ -13,7 +13,6 @@ bevy_mod_picking = { git = "https://github.com/tychedelia/bevy_mod_picking" }
 
 [dependencies]
 bevy = {workspace=true}
-# bevy = "0.13.2"
 bevy_mod_picking = "0.18"
 impl-trait-for-tuples = "0.2.2"
 smallvec = "1.13.2"

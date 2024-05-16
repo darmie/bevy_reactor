@@ -1,4 +1,4 @@
-use crate::view::{View, IntoView, ViewRef};
+use crate::view::{IntoView, ViewRef};
 use bevy::ecs::{entity::Entity, world::World};
 use impl_trait_for_tuples::*;
 use smallvec::SmallVec;
