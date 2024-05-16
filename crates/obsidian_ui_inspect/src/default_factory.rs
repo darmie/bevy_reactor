@@ -1,5 +1,8 @@
 use crate::{
-    editors::{bool::FieldEditBool, color::FieldEditSrgba, fallback::FieldEditFallback},
+    editors::{
+        bool::FieldEditBool, color::FieldEditSrgba, fallback::FieldEditFallback,
+        list::FieldEditList,
+    },
     templates::{field_label::FieldLabel, field_readonly_value::FieldReadonlyValue},
     InspectableField, InspectorFactory,
 };
@@ -71,15 +74,7 @@ impl InspectorFactory for DefaultInspectorFactory {
                 ))
                 .into_view(),
             ),
-            ReflectRef::List(_) => Some(
-                Fragment::new((
-                    FieldLabel {
-                        field: field.clone(),
-                    },
-                    FieldReadonlyValue::new().children("List:TODO"),
-                ))
-                .into_view(),
-            ),
+            ReflectRef::List(_) => Some(FieldEditList(field.clone()).into_view()),
             ReflectRef::Array(_) => Some(
                 Fragment::new((
                     FieldLabel {

@@ -63,7 +63,11 @@ impl<
     > View for ForIndex<Item, ItemIter, ItemFn, V, F>
 {
     fn nodes(&self) -> NodeSpan {
-        let child_spans: Vec<NodeSpan> = self.items.iter().map(|item| item.view.nodes()).collect();
+        let mut child_spans: Vec<NodeSpan> =
+            self.items.iter().map(|item| item.view.nodes()).collect();
+        if let Some(ref fallback) = self.fallback {
+            child_spans.push(fallback.nodes());
+        }
         NodeSpan::Fragment(child_spans.into_boxed_slice())
     }
 

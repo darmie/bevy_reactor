@@ -109,6 +109,7 @@ impl<B: Bundle + Default> View for Element<B> {
     }
 
     fn build(&mut self, view_entity: Entity, world: &mut World) {
+        // assert!(self.display.is_none());
         if self.debug_name.is_empty() {
             world.entity_mut(view_entity).insert(Name::new("Element"));
         } else {
@@ -160,7 +161,7 @@ impl<B: Bundle + Default> View for Element<B> {
         world.entity_mut(self.display.unwrap()).despawn();
         self.display = None;
 
-        // Delete all reactions.
+        // Delete all reactions and despawn the view entity.
         world.despawn_owned_recursive(view_entity);
     }
 

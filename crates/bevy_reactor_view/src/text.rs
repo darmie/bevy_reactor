@@ -29,7 +29,10 @@ impl TextStatic {
 
 impl View for TextStatic {
     fn nodes(&self) -> NodeSpan {
-        NodeSpan::Node(self.node.unwrap())
+        match self.node {
+            Some(node) => NodeSpan::Node(node),
+            None => NodeSpan::Empty,
+        }
     }
 
     fn build(&mut self, _view_entity: Entity, world: &mut World) {
@@ -49,7 +52,7 @@ impl View for TextStatic {
 
     fn raze(&mut self, _view_entity: Entity, world: &mut World) {
         // Delete the display node.
-        let display = self.node.expect("Razing unbuilt DynTextNode");
+        let display = self.node.expect("Razing unbuilt TextStatic");
         world.entity_mut(display).remove_parent();
         world.entity_mut(display).despawn();
         self.node = None;
@@ -85,7 +88,10 @@ impl<F: FnMut(&Rcx) -> String> TextComputed<F> {
 
 impl<F: FnMut(&Rcx) -> String> View for TextComputed<F> {
     fn nodes(&self) -> NodeSpan {
-        NodeSpan::Node(self.node.unwrap())
+        match self.node {
+            Some(node) => NodeSpan::Node(node),
+            None => NodeSpan::Empty,
+        }
     }
 
     fn build(&mut self, view_entity: Entity, world: &mut World) {
@@ -120,10 +126,11 @@ impl<F: FnMut(&Rcx) -> String> View for TextComputed<F> {
     }
 
     fn raze(&mut self, view_entity: Entity, world: &mut World) {
-        let display = self.node.expect("Razing unbuilt DynTextNode");
+        let display = self.node.expect("Razing unbuilt TextComputed");
         world.entity_mut(display).remove_parent();
         world.entity_mut(display).despawn();
         world.despawn_owned_recursive(view_entity);
+        self.node = None;
     }
 }
 

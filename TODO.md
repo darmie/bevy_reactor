@@ -5,11 +5,6 @@
   - Shortcuts
   - Checkmarks and checkmark spacing
 - Property Editor.
-  - Group:
-    - Disclosure
-    - Icon
-    - Title
-    - Dropdown
 - Components and Resources as signals?
   - This is problematic because it would require Signal<T> to impl Component/Resource.
 - Change tab key handling to use bubbled events.
@@ -22,16 +17,16 @@
 - Can we make ForEach not require cloning the iterator?
 - Persist recent colors
 - Text Input
-
   - drag to select (requires text measurement)
   - correct rendering of selection rects and cursor
   - correct rendering of focus rect (just uses outline for now)
   - correct rendering of rounded corners
+- Having to explicitly dim button contents for disabled buttons is a pain.
 
 # Node Graph
 
 - split into its own crate
-- color editor
+- color editor (embedded graph node version)
 - bug in shader when quadratics are straight
 - input should be a polyline
 - line colors should match terminal colors

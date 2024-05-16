@@ -276,7 +276,6 @@ fn handle_tab(
 
 fn handle_text_input(
     mut key_events: EventReader<KeyboardInput>,
-    mut char_events: EventReader<KeyboardInput>,
     key: Res<ButtonInput<KeyCode>>,
     focus: ResMut<Focus>,
     mut press_writer: EventWriter<KeyPressEvent>,
@@ -285,23 +284,22 @@ fn handle_text_input(
     if let Some(focus_elt) = focus.0 {
         for ev in key_events.read() {
             if ev.state == ButtonState::Pressed {
-                let ev = KeyPressEvent {
+                let press_event = KeyPressEvent {
                     target: focus_elt,
                     key_code: ev.key_code,
                     repeat: !key.just_pressed(ev.key_code),
                     shift: key.pressed(KeyCode::ShiftLeft) || key.pressed(KeyCode::ShiftRight),
                 };
-                press_writer.send(ev);
-            }
-        }
+                press_writer.send(press_event);
 
-        for _ev in char_events.read() {
-            // println!("Key char: {:?}", ev.char);
-            let ev = KeyCharEvent {
-                target: focus_elt,
-                key: 'a', // ev.char,
-            };
-            char_writer.send(ev);
+                if let bevy::input::keyboard::Key::Character(ref ch) = ev.logical_key {
+                    let ev = KeyCharEvent {
+                        target: focus_elt,
+                        key: ch.chars().next().unwrap(),
+                    };
+                    char_writer.send(ev);
+                }
+            }
         }
     }
 }

@@ -21,6 +21,9 @@ pub trait Inspectable: Send + Sync {
 
     /// Update a field within the item
     fn set_field(&self, cx: &mut Cx, path: &ParsedPath, value: &dyn Reflect);
+
+    /// Apply a closure to a field within the item
+    fn update_field(&self, cx: &mut Cx, path: &ParsedPath, f: &dyn Fn(&mut dyn Reflect));
 }
 
 /// A resource that can be inspected
@@ -59,6 +62,11 @@ impl<T: Resource + Reflect> Inspectable for InspectableResource<T> {
         let mut res = cx.world_mut().get_resource_mut::<T>().unwrap();
         res.reflect_path_mut(path).unwrap().apply(value);
     }
+
+    fn update_field(&self, cx: &mut Cx, path: &ParsedPath, f: &dyn Fn(&mut dyn Reflect)) {
+        let mut res = cx.world_mut().get_resource_mut::<T>().unwrap();
+        f(res.reflect_path_mut(path).unwrap());
+    }
 }
 
 /// A reference to a field within an `Inspectable`. This contains information needed to
@@ -91,6 +99,11 @@ impl InspectableField {
     /// Whether the item can be removed (in other words, is it optional or an array element)
     pub fn can_remove(&self) -> bool {
         self.can_remove
+    }
+
+    /// Use a closure to modify the reflected field data.
+    pub fn update(&self, cx: &mut Cx, f: &dyn Fn(&mut dyn Reflect)) {
+        self.root.update_field(cx, &self.path, f);
     }
 
     /// Remove the value from the parent

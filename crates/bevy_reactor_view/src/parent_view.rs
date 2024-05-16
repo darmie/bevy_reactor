@@ -64,10 +64,11 @@ pub trait ParentView: Sized {
     /// Raze all child views.
     fn raze_children(&mut self, world: &mut World) {
         // Raze all child views
-        for child in self.get_children_mut().drain(..) {
+        for child in self.get_children_mut().iter_mut() {
             // Calling `raze` on the child view will despawn the child entity.
-            let inner = child.view;
+            let inner = child.view.clone();
             inner.raze(child.entity.unwrap(), world);
+            child.entity = None;
         }
     }
 }
