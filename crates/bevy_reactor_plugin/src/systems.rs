@@ -9,7 +9,7 @@ use bevy_reactor_view::{CompositorCamera, DisplayNodeChanged, ViewHandle, ViewRo
 
 
 /// System that initializes any views that have been added.
-pub fn build_added_view_roots(world: &mut World) {
+pub(crate) fn build_added_view_roots(world: &mut World) {
     // Need to copy query result to avoid double-borrow of world.
     let mut roots = world.query_filtered::<(Entity, &mut ViewRoot), Added<ViewRoot>>();
     let roots_copy: Vec<Entity> = roots.iter(world).map(|(e, _)| e).collect();
@@ -24,7 +24,7 @@ pub fn build_added_view_roots(world: &mut World) {
 
 
 /// System that looks for changed child views and replaces the parent's child nodes.
-pub  fn attach_child_views(world: &mut World) {
+pub(crate)  fn attach_child_views(world: &mut World) {
     let mut query = world.query_filtered::<Entity, With<DisplayNodeChanged>>();
     let query_copy = query.iter(world).collect::<Vec<Entity>>();
     for entity in query_copy {
@@ -79,7 +79,7 @@ pub  fn attach_child_views(world: &mut World) {
 // Hover change detection system
 // Note: previously this was implemented as a Reaction, however it was reacting every frame
 // because HoverMap is mutated every frame regardless of whether or not it changed.
-pub fn update_hover_states(
+pub(crate) fn update_hover_states(
     hover_map: Option<Res<HoverMap>>,
     mut hovers: Query<(Entity, &mut Hovering)>,
     parent_query: Query<&Parent>,
@@ -100,7 +100,7 @@ pub fn update_hover_states(
 }
 
 // Text system 
-pub fn update_text_styles(
+pub(crate) fn update_text_styles(
     mut commands: Commands,
     mut query: Query<(Entity, &mut Text), With<TextStyleChanged>>,
     inherited: Query<&InheritableFontStyles>,
@@ -153,7 +153,7 @@ pub fn update_text_styles(
 }
 
 // Compositor system
-pub fn update_compositor_size(
+pub(crate) fn update_compositor_size(
     query_camera: Query<(Entity, &Camera), With<CompositorCamera>>,
     query_children: Query<(&Node, &GlobalTransform, &TargetCamera)>,
     mut images: ResMut<Assets<Image>>,
@@ -182,7 +182,7 @@ pub fn update_compositor_size(
 }
 
 /// Run reactions whose dependencies have changed.
-pub fn run_reactions(world: &mut World) {
+pub(crate) fn run_reactions(world: &mut World) {
     let mut scopes = world.query::<(Entity, &mut TrackingScope)>();
     let mut changed = HashSet::<Entity>::default();
     let tick = world.change_tick();

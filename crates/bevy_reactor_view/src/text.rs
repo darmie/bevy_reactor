@@ -5,11 +5,11 @@ use bevy_reactor_style::TextStyleChanged;
 use bevy_reactor_core::{
     NodeSpan,
     TrackingScope,
-    //view::View,
     DespawnScopes,Rcx
 };
 
 use crate::view::{View, IntoView, ViewRef};
+
 
 /// A UI element that displays text
 pub struct TextStatic {
