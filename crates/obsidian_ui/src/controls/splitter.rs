@@ -42,6 +42,25 @@ fn style_vsplitter_inner(ss: &mut StyleBuilder) {
         .height(ui::Val::Percent(20.));
 }
 
+
+fn style_hsplitter(ss: &mut StyleBuilder) {
+    ss.align_items(ui::AlignItems::Center)
+        .justify_content(ui::JustifyContent::Center)
+        .display(ui::Display::Flex)
+        .flex_direction(ui::FlexDirection::Column)
+        .gap(8)
+        .height(9)
+        .background_color(colors::U2);
+}
+
+// The decorative handle inside the splitter.
+fn style_hsplitter_inner(ss: &mut StyleBuilder) {
+    ss.display(ui::Display::Flex)
+        .height(3)
+        // .pointer_events(PointerEvents::None)
+        .width(ui::Val::Percent(20.));
+}
+
 /// Splitter bar which can be dragged
 pub struct Splitter {
     /// The current split value.
@@ -95,10 +114,19 @@ impl ViewTemplate for Splitter {
         let hovering = cx.create_hover_signal(id);
         let drag_state = cx.create_mutable::<DragState>(DragState::default());
         let current_offset = self.value;
+        let direction = self.direction.clone();
+        let style_splitter = match self.direction {
+            SplitterDirection::Horizontal => style_hsplitter,
+            SplitterDirection::Vertical => style_vsplitter,
+        };
+        let style_splitter_inner = match self.direction {
+            SplitterDirection::Horizontal => style_hsplitter_inner,
+            SplitterDirection::Vertical => style_vsplitter_inner,
+        };
         Element::<NodeBundle>::for_entity(id)
             .named("Splitter")
             // .class_names(CLS_DRAG.if_true(cx.read_atom(drag_state).dragging))
-            .style(style_vsplitter)
+            .style(style_splitter)
             .insert((
                 On::<Pointer<DragStart>>::run(move |world: &mut World| {
                     // Save initial value to use as drag offset.
@@ -129,7 +157,14 @@ impl ViewTemplate for Splitter {
                         let ds = drag_state.get(world);
                         if let Some(on_change) = on_change {
                             if ds.dragging {
-                                world.run_callback(on_change, ev.x + ds.offset);
+                                match direction {
+                                    SplitterDirection::Horizontal => {
+                                        world.run_callback(on_change, ds.offset - ev.y);
+                                    },
+                                    SplitterDirection::Vertical => {
+                                        world.run_callback(on_change, ev.x + ds.offset);
+                                    },
+                                }
                             }
                         }
                     }
@@ -147,7 +182,7 @@ impl ViewTemplate for Splitter {
             ))
             .children(
                 Element::<NodeBundle>::new()
-                    .style(style_vsplitter_inner)
+                    .style(style_splitter_inner)
                     .create_effect(move |cx, ent| {
                         // Color change on hover / drag
                         let ds = drag_state.get(cx);

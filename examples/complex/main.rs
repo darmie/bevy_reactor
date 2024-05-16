@@ -129,6 +129,9 @@ fn style_scroll_area(ss: &mut StyleBuilder) {
 #[derive(Resource)]
 pub struct PanelWidth(f32);
 
+#[derive(Resource)]
+pub struct PanelHeight(f32);
+
 #[derive(Resource, Default)]
 pub struct SelectedShape(Option<Entity>);
 
@@ -137,6 +140,7 @@ pub enum EditorState {
     #[default]
     Preview,
     Graph,
+    Split,
 }
 
 #[derive(Resource)]
@@ -160,6 +164,7 @@ fn main() {
             ..default()
         })
         .insert_resource(PanelWidth(200.))
+        .insert_resource(PanelHeight(300.))
         .init_resource::<viewport::ViewportInset>()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(DefaultPickingPlugins)
@@ -189,12 +194,17 @@ fn main() {
             (
                 close_on_esc,
                 rotate.run_if(in_state(EditorState::Preview)),
+                rotate.run_if(in_state(EditorState::Split)),
                 viewport::update_viewport_inset.run_if(in_state(EditorState::Preview)),
+                viewport::update_viewport_inset.run_if(in_state(EditorState::Split)),
                 viewport::update_camera_viewport.run_if(in_state(EditorState::Preview)),
+                viewport::update_camera_viewport.run_if(in_state(EditorState::Split)),
             ),
         )
         .add_systems(OnEnter(EditorState::Preview), enter_preview_mode)
         .add_systems(OnExit(EditorState::Preview), exit_preview_mode)
+        .add_systems(OnEnter(EditorState::Split), enter_preview_mode)
+        .add_systems(OnExit(EditorState::Split), exit_preview_mode)
         .run();
 }
 
@@ -292,7 +302,7 @@ impl ViewTemplate for DemoUi {
                                 })),
                             ToolButton::new()
                                 .children("Materials")
-                                .corners(RoundedCorners::Right)
+                                .corners(RoundedCorners::None)
                                 .variant(cx.create_derived(|cx| {
                                     let st = cx.use_resource::<State<EditorState>>();
                                     if *st.get() == EditorState::Graph {
@@ -306,6 +316,24 @@ impl ViewTemplate for DemoUi {
                                         cx.world_mut().get_resource_mut::<NextState<EditorState>>()
                                     {
                                         mode.set(EditorState::Graph);
+                                    }
+                                })),
+                            ToolButton::new()
+                                .children("Split")
+                                .corners(RoundedCorners::Right)
+                                .variant(cx.create_derived(|cx| {
+                                    let st = cx.use_resource::<State<EditorState>>();
+                                    if *st.get() == EditorState::Split {
+                                        ButtonVariant::Selected
+                                    } else {
+                                        ButtonVariant::Default
+                                    }
+                                }))
+                                .on_click(cx.create_callback(|cx, _| {
+                                    if let Some(mut mode) =
+                                        cx.world_mut().get_resource_mut::<NextState<EditorState>>()
+                                    {
+                                        mode.set(EditorState::Split);
                                     }
                                 })),
                         )),
@@ -379,24 +407,72 @@ impl ViewTemplate for DemoUi {
 
 struct CenterPanel;
 
+fn wrapper_style(ss: &mut StyleBuilder) {
+    ss.display(Display::Flex)
+        .width(ui::Val::Percent(100.))
+        .height(ui::Val::Percent(100.))
+        .flex_direction(FlexDirection::Column);
+}
+
+fn graph_view_style(ss: &mut StyleBuilder) {
+    ss.display(Display::Flex).width(ui::Val::Percent(100.));
+}
+
 impl ViewTemplate for CenterPanel {
-    fn create(&self, _cx: &mut Cx) -> impl IntoView {
-        Cond::new(
-            |cx| *cx.use_resource::<State<EditorState>>().get() == EditorState::Preview,
-            || {
-                Element::<NodeBundle>::new()
-                    .named("Preview")
-                    .style(style_viewport)
-                    .insert((viewport::ViewportInsetElement, Pickable::IGNORE))
-                    .children(
+    fn create(&self, cx: &mut Cx) -> impl IntoView {
+        let panel_height = cx.create_derived(|cx| {
+            let res = cx.use_resource::<PanelHeight>();
+            res.0
+        });
+
+        let drag_call_back = cx.create_callback(|cx: &mut Cx, value: f32| {
+            let mut panel_height = cx.world_mut().get_resource_mut::<PanelHeight>().unwrap();
+            panel_height.0 = value.max(200.);
+        });
+
+        Element::<NodeBundle>::new()
+            .children((Cond::new(
+                |cx| *cx.use_resource::<State<EditorState>>().get() == EditorState::Graph,
+                ||  NodeGraphDemo {},
+                move || {
+                    Fragment::new((
                         Element::<NodeBundle>::new()
-                            .named("Log")
-                            .style(style_log)
-                            .children(Element::<NodeBundle>::new().style(style_log_inner)),
-                    )
-            },
-            || NodeGraphDemo {},
-        )
+                            .named("Preview")
+                            .style(style_viewport)
+                            .insert((viewport::ViewportInsetElement, Pickable::IGNORE))
+                            .children(
+                                Element::<NodeBundle>::new()
+                                    .named("Log")
+                                    .style(style_log)
+                                    .children(Element::<NodeBundle>::new().style(style_log_inner)),
+                            ),
+                        Cond::new(
+                            |cx| {
+                                *cx.use_resource::<State<EditorState>>().get() == EditorState::Split
+                            },
+                            move || {
+                                Fragment::new((
+                                    Splitter::new()
+                                        .direction(SplitterDirection::Horizontal)
+                                        .value(panel_height)
+                                        .on_change(drag_call_back),
+                                    Element::<NodeBundle>::new()
+                                        .style(graph_view_style)
+                                        .create_effect(move |cx, ent| {
+                                            let height = panel_height.get(cx);
+                                            let mut style =
+                                                cx.world_mut().get_mut::<ui::Style>(ent).unwrap();
+                                            style.height = ui::Val::Px(height);
+                                        })
+                                        .children(NodeGraphDemo {}),
+                                ))
+                            },
+                            || (),
+                        ),
+                    ))
+                },
+            ),))
+            .style(wrapper_style)
     }
 }
 
