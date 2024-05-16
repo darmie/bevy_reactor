@@ -1,5 +1,7 @@
 use bevy::{prelude::*, ui};
-use bevy_reactor::*;
+use bevy_reactor_core::*;
+use bevy_reactor_style::*;
+use bevy_reactor_view::*;
 use obsidian_ui::{
     colors,
     controls::{Icon, MenuButton, MenuPopup, Spacer, Swatch},

@@ -10,7 +10,9 @@ use bevy::{
         render_resource::{Extent3d, TextureDimension, TextureFormat},
     },
 };
-use bevy_reactor::*;
+use bevy_reactor_core::*;
+use bevy_reactor_style::*;
+use bevy_reactor_view::*;
 
 fn style_test(ss: &mut StyleBuilder) {
     ss.display(Display::Flex)
@@ -24,7 +26,7 @@ fn main() {
         .init_resource::<Counter>()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         // .add_plugins((CorePlugin, InputPlugin, InteractionPlugin, BevyUiBackend))
-        .add_plugins(ReactorPlugin)
+        .add_plugins(bevy_reactor_plugin::ReactorPlugin)
         .add_systems(Startup, (setup, setup_view_root))
         .add_systems(Update, (close_on_esc, rotate, update_counter))
         .run();

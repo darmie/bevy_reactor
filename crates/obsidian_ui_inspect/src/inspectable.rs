@@ -5,7 +5,7 @@ use bevy::{
     prelude::*,
     reflect::{DynamicEnum, DynamicVariant, ParsedPath, ReflectPathError},
 };
-use bevy_reactor::*;
+use bevy_reactor_core::*;
 
 /// Trait that represents an item that can be inspected
 #[allow(unused_variables)]

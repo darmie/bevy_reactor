@@ -1,6 +1,8 @@
 use bevy::{color::Srgba, prelude::*, ui};
 use bevy_mod_picking::prelude::*;
-use bevy_reactor::*;
+use bevy_reactor_core::{Callback, Cx, EffectTarget, IntoSignal, RunContextSetup, RunContextWrite, Signal};
+use bevy_reactor_style::*;
+use bevy_reactor_view::{Cond, Element, IntoView, ParentView, ViewTemplate};
 // use bevy_tabindex::TabIndex;
 
 use crate::materials::SwatchRectMaterial;

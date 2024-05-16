@@ -4,7 +4,8 @@ use crate::{
     InspectableField, InspectorFactory,
 };
 use bevy::reflect::ReflectRef;
-use bevy_reactor::*;
+use bevy_reactor_core::*;
+use bevy_reactor_view::*;
 
 #[derive(Default)]
 pub struct DefaultInspectorFactory;

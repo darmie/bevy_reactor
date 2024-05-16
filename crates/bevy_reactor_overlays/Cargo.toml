@@ -7,4 +7,6 @@ edition = "2021"
 bevy = { git = "https://github.com/bevyengine/bevy.git" }
 # bevy = "0.13.1"
 bevy_mod_picking = "0.18.0"
-bevy_reactor = { path = "../.." }
+bevy_reactor_core = {path = "../bevy_reactor_core"}
+bevy_reactor_style = {path = "../bevy_reactor_style"}
+bevy_reactor_view = {path = "../bevy_reactor_view"}

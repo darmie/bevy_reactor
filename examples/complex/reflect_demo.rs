@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
 use bevy::prelude::*;
-use bevy_reactor::*;
+use bevy_reactor_core::*;
+use bevy_reactor_view::*;
 use obsidian_ui_inspect::{InspectableResource, Inspector};
 
 #[derive(Resource, Debug, Reflect, Clone, Default)]

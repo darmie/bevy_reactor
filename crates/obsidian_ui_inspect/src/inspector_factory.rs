@@ -1,5 +1,6 @@
 use bevy::prelude::*;
-use bevy_reactor::*;
+use bevy_reactor_core::*;
+use bevy_reactor_view::*;
 
 use crate::InspectableField;
 

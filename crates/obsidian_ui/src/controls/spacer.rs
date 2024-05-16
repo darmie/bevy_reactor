@@ -1,5 +1,8 @@
 use bevy::prelude::*;
-use bevy_reactor::*;
+use bevy_reactor_core::Cx;
+use bevy_reactor_style::*;
+use bevy_reactor_view::{Element, IntoView, ViewTemplate};
+
 
 fn style_spacer(ss: &mut StyleBuilder) {
     ss.flex_grow(1.);

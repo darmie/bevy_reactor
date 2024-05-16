@@ -3,7 +3,7 @@ use bevy::{
     ecs::{entity::Entity, world::World},
     hierarchy::Parent,
 };
-use bevy_reactor::{Cx, RunContextRead, RunContextSetup, Signal};
+use bevy_reactor_core::{Cx, RunContextRead, RunContextSetup, Signal};
 
 use crate::focus::FocusVisible;
 

@@ -4,7 +4,9 @@ use bevy::{
     math::UVec2,
     ui::{self, node_bundles::NodeBundle},
 };
-use bevy_reactor::*;
+use bevy_reactor_core::*;
+use bevy_reactor_style::*;
+use bevy_reactor_view::*;
 use obsidian_ui::{
     controls::{Button, ButtonVariant, ColorGradient, GradientSlider, Swatch, SwatchGrid},
     RoundedCorners,

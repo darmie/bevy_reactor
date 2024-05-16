@@ -7,7 +7,8 @@ use bevy_mod_picking::{
     backends::raycast::RaycastPickable,
     prelude::*,
 };
-use bevy_reactor::*;
+use bevy_reactor_core::*;
+use bevy_reactor_view::*;
 use bevy_reactor_overlays::{OverlayShape, PolygonOptions, StrokeMarker};
 use obsidian_ui::colors;
 

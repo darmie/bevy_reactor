@@ -1,6 +1,8 @@
 use bevy::{color::Srgba, prelude::*, ui};
 use bevy_mod_picking::prelude::*;
-use bevy_reactor::*;
+use bevy_reactor_core::{Callback, Cx, IntoSignal, RunContextSetup, RunContextWrite, Signal, EffectTarget};
+use bevy_reactor_style::{StyleBuilder, StyleBuilderBackground, StyleBuilderLayout, StyleHandle, StyleTuple, WithStyles};
+use bevy_reactor_view::{Element, IntoView, ParentView, ViewTemplate};
 
 use crate::materials::GradientRectMaterial;
 

@@ -27,6 +27,11 @@ obsidian_ui = { path = "crates/obsidian_ui" }
 obsidian_ui_inspect = { path = "crates/obsidian_ui_inspect" }
 bevy_reactor_overlays = { path = "crates/bevy_reactor_overlays" }
 bevy_picking_backdrop = { path = "crates/bevy_picking_backdrop" }
+bevy_reactor_core = {path = "crates/bevy_reactor_core"}
+bevy_reactor_style = {path = "crates/bevy_reactor_style"}
+bevy_reactor_view = {path = "crates/bevy_reactor_view"}
+bevy_reactor_plugin = {path = "crates/bevy_reactor_plugin"}
+
 
 [patch.crates-io]
 bevy_mod_picking = { git = "https://github.com/tychedelia/bevy_mod_picking" }

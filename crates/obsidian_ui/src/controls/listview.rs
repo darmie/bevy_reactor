@@ -1,5 +1,8 @@
 use bevy::{prelude::*, ui};
-use bevy_reactor::*;
+use bevy_reactor_style::*;
+use bevy_reactor_view::*;
+use bevy_reactor_core::*;
+
 
 use crate::colors;
 

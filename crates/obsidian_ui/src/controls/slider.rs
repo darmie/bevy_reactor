@@ -4,7 +4,9 @@ use bevy::{
     ui,
 };
 use bevy_mod_picking::prelude::*;
-use bevy_reactor::*;
+use bevy_reactor_core::{Callback, CreateHoverSignal, Cx, EffectTarget, IntoSignal, Mutable, RunContextSetup, RunContextWrite, Signal};
+use bevy_reactor_style::*;
+use bevy_reactor_view::{text_computed, Cond, Element, IntoView, ParentView, ViewTemplate, Fragment};
 
 use crate::{colors, materials::SliderRectMaterial, RoundedCorners};
 

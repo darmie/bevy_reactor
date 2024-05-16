@@ -1,4 +1,5 @@
-use bevy_reactor::*;
+use bevy_reactor_core::*;
+use bevy_reactor_view::*;
 
 use crate::{
     templates::{field_label::FieldLabel, field_readonly_value::FieldReadonlyValue},

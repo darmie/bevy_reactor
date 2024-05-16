@@ -1,5 +1,7 @@
 use bevy::{color::Srgba, prelude::*, ui};
-use bevy_reactor::*;
+use bevy_reactor_core::{Callback, Cx, IntoSignal, RunContextSetup, RunContextWrite, Signal};
+use bevy_reactor_style::*;
+use bevy_reactor_view::{Element, For, IntoView, ParentView, ViewTemplate};
 
 use crate::colors;
 

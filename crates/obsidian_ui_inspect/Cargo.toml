@@ -6,4 +6,7 @@ edition = "2021"
 [dependencies]
 bevy = { git = "https://github.com/bevyengine/bevy.git" }
 obsidian_ui = { path = "../obsidian_ui" }
-bevy_reactor = { path = "../.." }
+bevy_reactor_core = {path = "../bevy_reactor_core"}
+bevy_reactor_style = {path = "../bevy_reactor_style"}
+bevy_reactor_view = {path = "../bevy_reactor_view"}
+

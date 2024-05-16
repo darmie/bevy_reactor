@@ -1,5 +1,7 @@
 use bevy::prelude::*;
-use bevy_reactor::*;
+use bevy_reactor_view::*;
+use bevy_reactor_core::*;
+use bevy_reactor_style::*;
 use obsidian_ui::controls::Checkbox;
 
 use crate::{templates::field_label::FieldLabel, InspectableField};

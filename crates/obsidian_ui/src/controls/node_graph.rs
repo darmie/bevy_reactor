@@ -2,7 +2,10 @@ use std::ops::Mul;
 
 use bevy::{prelude::*, ui};
 use bevy_mod_picking::prelude::*;
-use bevy_reactor::*;
+
+use bevy_reactor_core::{Callback, CreateHoverSignal, Cx, EffectTarget, IntoSignal, RunContextSetup, RunContextWrite, Signal};
+use bevy_reactor_style::*;
+use bevy_reactor_view::{ChildArray, ChildViewTuple, Cond, Element, IntoView, ParentView, ViewRef, ViewTemplate};
 
 use crate::{
     colors,

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_reactor::{Cx, RunContextRead, RunContextSetup, Signal};
+use bevy_reactor_core::{Cx, RunContextRead, RunContextSetup, Signal};
 
 /// Plugin that runs the timers for bistable transitions.
 pub struct BistableTransitionPlugin;
