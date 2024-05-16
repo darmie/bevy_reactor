@@ -1,3 +1,5 @@
+
+
 use std::sync::{Arc, Mutex};
 
 use bevy::ecs::{component::Component, entity::Entity, world::World};
@@ -27,7 +29,7 @@ pub type ReactionRef = Arc<Mutex<dyn Reaction + Sync + Send + 'static>>;
 /// Component which contains a reference to a reaction. Generally the entity will also
 /// have a [`TrackingScope`] component.
 #[derive(Component)]
-pub struct ReactionCell(pub(crate) ReactionRef);
+pub struct ReactionCell(pub ReactionRef);
 
 impl ReactionCell {
     /// Construct a new [`ReactionCell`].
@@ -40,10 +42,3 @@ impl ReactionCell {
 /// id is not known until the reaction is started. This component tracks the target entity.
 #[derive(Component)]
 pub struct ReactionTarget(pub Entity);
-
-
-
-
-/// Component used to hold a reference to a [`Reaction`].
-#[derive(Component, Clone)]
-pub struct ReactionHandle(pub(crate) Arc<Mutex<dyn Reaction+ Sync + Send + 'static>>);

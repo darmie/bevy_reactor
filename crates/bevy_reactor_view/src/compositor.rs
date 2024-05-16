@@ -199,30 +199,4 @@ impl WithStyles for Compositor {
     }
 }
 
-pub fn update_compositor_size(
-    query_camera: Query<(Entity, &Camera), With<CompositorCamera>>,
-    query_children: Query<(&Node, &GlobalTransform, &TargetCamera)>,
-    mut images: ResMut<Assets<Image>>,
-) {
-    for (camera_entity, camera) in query_camera.iter() {
-        let image = images.get_mut(camera.target.as_image().unwrap()).unwrap();
-        let mut size = Extent3d {
-            width: 16,
-            height: 16,
-            ..Extent3d::default()
-        };
 
-        for (node, transform, target) in query_children.iter() {
-            let target = target.0;
-            if target == camera_entity {
-                let rect = node.logical_rect(transform);
-                size.width = size.width.max(rect.max.x.ceil() as u32);
-                size.height = size.height.max(rect.max.y.ceil() as u32);
-            }
-        }
-
-        if image.width() != size.width || image.height() != size.height {
-            image.resize(size);
-        }
-    }
-}

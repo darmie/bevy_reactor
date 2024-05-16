@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use bevy_reactor_style::{InheritableFontStyles, TextStyleChanged};
+use bevy_reactor_style::TextStyleChanged;
 
 use bevy_reactor_core::{
     NodeSpan,
@@ -135,57 +135,5 @@ pub fn text_computed<F: FnMut(&Rcx) -> String>(text: F) -> TextComputed<F> {
 impl<F: Send + Sync + 'static + FnMut(&Rcx) -> String> IntoView for TextComputed<F> {
     fn into_view(self) -> ViewRef {
         ViewRef::new(self)
-    }
-}
-
-pub fn update_text_styles(
-    mut commands: Commands,
-    mut query: Query<(Entity, &mut Text), With<TextStyleChanged>>,
-    inherited: Query<&InheritableFontStyles>,
-    parents: Query<&Parent>,
-    server: Res<AssetServer>,
-) {
-    for (entity, mut text) in query.iter_mut() {
-        let mut styles = InheritableFontStyles::default();
-
-        // Search parents for inherited styles.
-        let mut ancestor = entity;
-        loop {
-            if styles.is_final() {
-                break;
-            }
-            if let Ok(inherited_styles) = inherited.get(ancestor) {
-                styles.merge(inherited_styles);
-                if styles.is_final() {
-                    break;
-                }
-            }
-            if let Ok(parent) = parents.get(ancestor) {
-                ancestor = parent.get();
-            } else {
-                break;
-            }
-        }
-
-        // If we have a font handle, but it's not ready, then skip this update.
-        if let Some(ref handle) = styles.font {
-            match server.load_state(handle) {
-                bevy::asset::LoadState::Loaded => {}
-                _ => {
-                    continue;
-                }
-            }
-        }
-
-        let style = TextStyle {
-            font: styles.font.unwrap_or_default(),
-            font_size: styles.font_size.unwrap_or(12.),
-            color: styles.color.unwrap_or(Color::WHITE),
-        };
-
-        for section in text.sections.iter_mut() {
-            section.style = style.clone();
-        }
-        commands.entity(entity).remove::<TextStyleChanged>();
     }
 }

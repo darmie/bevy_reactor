@@ -4,7 +4,6 @@ use bevy::{
     utils::HashSet,
 };
 
-use crate::reaction::{Reaction, ReactionCell, ReactionHandle};
 
 /// A component that tracks the dependencies of a reactive task.
 #[derive(Component)]
@@ -20,11 +19,11 @@ pub struct TrackingScope {
 
     /// Engine tick used for determining if components have changed. This represents the
     /// time of the previous reaction.
-    tick: Tick,
+    pub tick: Tick,
 
     /// List of cleanup functions to call when the scope is dropped.
     #[allow(clippy::type_complexity)]
-    pub(crate) cleanups: Vec<Box<dyn FnOnce(&mut World) + 'static + Sync + Send>>,
+    pub cleanups: Vec<Box<dyn FnOnce(&mut World) + 'static + Sync + Send>>,
 }
 
 /// A resource which, if inserted, displays the view entities that have reacted this frame.
@@ -86,7 +85,7 @@ impl TrackingScope {
 
     /// Returns true if any of the dependencies of this scope have been updated since
     /// the previous reaction.
-    fn dependencies_changed(&self, world: &World, tick: Tick) -> bool {
+    pub fn dependencies_changed(&self, world: &World, tick: Tick) -> bool {
         self.components_changed(world, tick) || self.resources_changed(world, tick)
     }
 
@@ -111,7 +110,7 @@ impl TrackingScope {
 
     /// Take the dependencies from another scope. Typically the other scope is a temporary
     /// scope that is used to compute the next set of dependencies.
-    pub(crate) fn take_deps(&mut self, other: &mut Self) {
+    pub fn take_deps(&mut self, other: &mut Self) {
         self.component_deps = std::mem::take(&mut other.component_deps);
         self.resource_deps = std::mem::take(&mut other.resource_deps);
         self.cleanups = std::mem::take(&mut other.cleanups);
@@ -146,59 +145,6 @@ impl DespawnScopes for World {
     }
 }
 
-/// Run reactions whose dependencies have changed.
-pub fn run_reactions(world: &mut World) {
-    let mut scopes = world.query::<(Entity, &mut TrackingScope)>();
-    let mut changed = HashSet::<Entity>::default();
-    let tick = world.change_tick();
-    for (entity, scope) in scopes.iter(world) {
-        if scope.dependencies_changed(world, tick) {
-            changed.insert(entity);
-        }
-    }
-
-    // Record the changed entities for debugging purposes.
-    if let Some(mut tracing) = world.get_resource_mut::<TrackingScopeTracing>() {
-        tracing.0 = changed.iter().copied().collect();
-    }
-
-    for scope_entity in changed.iter() {
-        // Call registered cleanup functions
-        let mut cleanups = match scopes.get_mut(world, *scope_entity) {
-            Ok((_, mut scope)) => std::mem::take(&mut scope.cleanups),
-            Err(_) => Vec::new(),
-        };
-        for cleanup_fn in cleanups.drain(..) {
-            cleanup_fn(world);
-        }
-
-        // Run the reaction
-        let mut next_scope = TrackingScope::new(tick);
-        if let Some(mut entt) = world.get_entity_mut(*scope_entity) {
-            if let Some(view_handle) = entt.get_mut::<ReactionHandle>() {
-                let inner = view_handle.0.clone();
-                inner
-                    .lock()
-                    .unwrap()
-                    .react(*scope_entity, world, &mut next_scope);
-            } else if let Some(reaction) = entt.get_mut::<ReactionCell>() {
-                let inner = reaction.0.clone();
-                inner
-                    .lock()
-                    .unwrap()
-                    .react(*scope_entity, world, &mut next_scope);
-            }
-        }
-
-        // Replace deps and cleanups in the current scope with the next scope.
-        if let Ok((_, mut scope)) = scopes.get_mut(world, *scope_entity) {
-            // Swap the scopes so that the next scope becomes the current scope.
-            // The old scopes will be dropped at the end of the loop block.
-            scope.take_deps(&mut next_scope);
-            scope.tick = tick;
-        }
-    }
-}
 
 #[cfg(test)]
 mod tests {

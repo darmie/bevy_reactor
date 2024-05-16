@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::{any::Any, sync::{Arc, Mutex}};
 
 use bevy::{
     core::Name,
@@ -15,8 +15,7 @@ use bevy::{
 use crate::{element::Element, text::{TextComputed, TextStatic}};
 
 use bevy_reactor_core::{
-    NodeSpan,  TrackingScope, Cx, DespawnScopes,
-    Signal
+    Cx, DespawnScopes,  NodeSpan,  Signal, TrackingScope
 };
 
 use bevy::ecs::bundle::Bundle;
@@ -71,7 +70,7 @@ impl<B: Bundle + Default> WithStyles for Element<B> {
 
 #[derive(Component)]
 /// Component which holds the top level of the view hierarchy.
-pub struct ViewRoot(pub(crate) Arc<Mutex<dyn View + Sync + Send + 'static>>);
+pub struct ViewRoot(pub Arc<Mutex<dyn View + Sync + Send + 'static>>);
 
 impl ViewRoot {
     /// Construct a new [`ViewRoot`].
@@ -110,16 +109,18 @@ impl Command for DespawnViewRoot {
     }
 }
 
+
 /// Component used to hold a reference to a [`View`].
 #[derive(Component, Clone)]
-pub struct ViewHandle(pub(crate) Arc<Mutex<dyn View + Sync + Send + 'static>>);
+pub struct ViewHandle(pub Arc<Mutex<dyn View+ Sync + Send + 'static>>);
 
 /// A reference to a [`View`] which can be passed around as a parameter.
 pub struct ViewRef(pub(crate) Arc<Mutex<dyn View + Sync + Send + 'static>>);
 
+
 impl ViewRef {
     /// Construct a new [`ViewRef`] from a [`View`].
-    pub fn new(view: impl View + Sync + Send + 'static) -> Self {
+    pub fn new(view:impl View + Sync + Send + 'static) -> Self  {
         Self(Arc::new(Mutex::new(view)))
     }
 
@@ -308,69 +309,5 @@ impl<W: ViewTemplate> View for ViewTemplateState<W> {
     }
 }
 
-/// System that initializes any views that have been added.
-pub fn build_added_view_roots(world: &mut World) {
-    // Need to copy query result to avoid double-borrow of world.
-    let mut roots = world.query_filtered::<(Entity, &mut ViewRoot), Added<ViewRoot>>();
-    let roots_copy: Vec<Entity> = roots.iter(world).map(|(e, _)| e).collect();
-    for root_entity in roots_copy.iter() {
-        let Ok((_, root)) = roots.get(world, *root_entity) else {
-            continue;
-        };
-        let inner = root.0.clone();
-        inner.lock().unwrap().build(*root_entity, world);
-    }
-}
 
-/// System that looks for changed child views and replaces the parent's child nodes.
-pub  fn attach_child_views(world: &mut World) {
-    let mut query = world.query_filtered::<Entity, With<DisplayNodeChanged>>();
-    let query_copy = query.iter(world).collect::<Vec<Entity>>();
-    for entity in query_copy {
-        world.entity_mut(entity).remove::<DisplayNodeChanged>();
-        let mut e = entity;
-        let mut finished = false;
-        loop {
-            if let Some(handle) = world.entity(e).get::<ViewHandle>() {
-                let inner = handle.0.clone();
-                if inner.lock().unwrap().children_changed(e, world) {
-                    finished = true;
-                    break;
-                }
-            }
 
-            if let Some(handle) = world.entity(e).get::<ViewRoot>() {
-                let inner = handle.0.clone();
-                if inner.lock().unwrap().children_changed(e, world) {
-                    finished = true;
-                    break;
-                }
-            }
-
-            e = match world.entity(e).get::<Parent>() {
-                Some(parent) => parent.get(),
-                None => {
-                    break;
-                }
-            };
-        }
-
-        if !finished {
-            warn!("DisplayNodeChanged not handled.");
-            e = entity;
-            loop {
-                if let Some(name) = world.entity(e).get::<Name>() {
-                    println!("* Entity: {:?}", name);
-                } else {
-                    println!("* Entity: {:?}", e);
-                }
-                e = match world.entity(e).get::<Parent>() {
-                    Some(parent) => parent.get(),
-                    None => {
-                        break;
-                    }
-                };
-            }
-        }
-    }
-}
